@@ -1,6 +1,6 @@
 from app.services.gemini_service import client
 from app.agent.prompts import SYSTEM_PROMPT
-from app.config import settings
+from app.config.settings import settings
 
 
 class DotAgent:
