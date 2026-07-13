@@ -6,47 +6,31 @@ from telegram.ext import (
     filters,
 )
 
-from app.agent.agent import DotAgent
-from app.config.settings import settings
+from app.ai.brain import DotBrain
+from app.config import config
 
-agent = DotAgent()
+brain = DotBrain()
 
 
-async def handle_message(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-):
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    if update.message is None or update.message.text is None:
-        return
+    text = update.message.text
 
-    user_message = update.message.text
+    answer = brain.chat(text)
 
-    try:
-        answer = agent.chat(user_message)
-
-        await update.message.reply_text(answer)
-
-    except Exception as e:
-        print(e)
-
-        await update.message.reply_text(
-            "Maaf, Dot AI sedang mengalami gangguan."
-        )
+    await update.message.reply_text(answer)
 
 
 def run_bot():
 
-    app = (
-        Application.builder()
-        .token(settings.TELEGRAM_BOT_TOKEN)
-        .build()
-    )
+    app = Application.builder().token(
+        config.TELEGRAM_BOT_TOKEN
+    ).build()
 
     app.add_handler(
         MessageHandler(
             filters.TEXT & ~filters.COMMAND,
-            handle_message,
+            handle_message
         )
     )
 
