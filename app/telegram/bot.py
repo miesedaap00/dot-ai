@@ -16,7 +16,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     text = update.message.text
 
-    answer = brain.chat(text)
+    answer = brain.chat(
+        update.effective_chat.id,
+        text
+    )
 
     await update.message.reply_text(answer)
 

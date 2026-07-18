@@ -1,22 +1,39 @@
 import sqlite3
 from pathlib import Path
 
-Path("data").mkdir(exist_ok=True)
 
-conn = sqlite3.connect(
-    "data/dot_ai.db",
-    check_same_thread=False
-)
+DB_PATH = Path("data/dot_ai.db")
 
-cursor = conn.cursor()
+DB_PATH.parent.mkdir(exist_ok=True)
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS memory(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id TEXT,
-    key TEXT,
-    value TEXT
-)
-""")
 
-conn.commit()
+def get_connection():
+
+    return sqlite3.connect(
+        DB_PATH,
+        check_same_thread=False
+    )
+
+
+def init_database():
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS memories (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            key TEXT NOT NULL,
+            value TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+            UNIQUE(user_id, key)
+        )
+    """)
+
+    conn.commit()
+
+    conn.close()

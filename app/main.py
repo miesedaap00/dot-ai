@@ -1,13 +1,8 @@
-from fastapi import FastAPI
+from app.services.database import init_database
 
-app = FastAPI(
-    title="Dot AI",
-    version="1.0.0"
-)
 
-@app.get("/")
-def root():
-    return {
-        "project": "Dot AI",
-        "status": "running"
-    }
+def start_app():
+
+    init_database()
+
+    print("Database initialized.")
