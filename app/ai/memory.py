@@ -1,3 +1,5 @@
+import json
+
 from app.services.database import get_connection
 
 
@@ -79,3 +81,54 @@ class MemoryManager:
         conn.close()
 
         return memories
+
+
+    def extract_and_save(
+        self,
+        user_id,
+        gemini,
+        message
+    ):
+
+        raw_response = gemini.extract_memories(
+            message
+        )
+
+        try:
+
+            cleaned_response = (
+                raw_response
+                .replace("```json", "")
+                .replace("```", "")
+                .strip()
+            )
+
+            data = json.loads(
+                cleaned_response
+            )
+
+            memories = data.get(
+                "memories",
+                []
+            )
+
+            for memory in memories:
+
+                key = memory.get("key")
+
+                value = memory.get("value")
+
+                if key and value:
+
+                    self.save(
+                        user_id,
+                        key,
+                        value
+                    )
+
+        except Exception as error:
+
+            print(
+                "Memory extraction error:",
+                error
+            )

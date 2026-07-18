@@ -1,6 +1,9 @@
 from app.services.gemini import GeminiService
+
 from app.ai.prompts import SYSTEM_PROMPT
+
 from app.ai.history import ConversationHistory
+
 from app.ai.memory import MemoryManager
 
 
@@ -15,17 +18,29 @@ class DotBrain:
         self.memory = MemoryManager()
 
 
-    def chat(self, chat_id: int, message: str):
+    def chat(
+        self,
+        chat_id: int,
+        message: str
+    ):
 
-        conversation = self.history.get_history(chat_id)
+        memories = self.memory.get_all(
+            chat_id
+        )
 
-        memories = self.memory.get_all(chat_id)
 
         memory_text = ""
 
         for key, value in memories:
 
-            memory_text += f"{key}: {value}\n"
+            memory_text += (
+                f"{key}: {value}\n"
+            )
+
+
+        conversation = self.history.get_history(
+            chat_id
+        )
 
 
         conversation_text = ""
@@ -53,11 +68,21 @@ PESAN USER:
 
 {message}
 
-Jawab berdasarkan informasi penting dan konteks percakapan.
+Jawab pesan user dengan mempertimbangkan
+memory dan riwayat percakapan.
 """
 
 
-        answer = self.gemini.generate(prompt)
+        answer = self.gemini.generate(
+            prompt
+        )
+
+
+        self.memory.extract_and_save(
+            chat_id,
+            self.gemini,
+            message
+        )
 
 
         self.history.add_message(

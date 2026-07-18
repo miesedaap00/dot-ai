@@ -1,5 +1,4 @@
 from google import genai
-from google.genai.errors import ServerError
 
 from app.config import config
 
@@ -7,26 +6,57 @@ from app.config import config
 class GeminiService:
 
     def __init__(self):
+
         self.client = genai.Client(
             api_key=config.GEMINI_API_KEY
         )
 
+
     def generate(self, prompt: str):
 
-        try:
-            response = self.client.models.generate_content(
-                model=config.GEMINI_MODEL,
-                contents=prompt
-            )
+        response = self.client.models.generate_content(
+            model=config.GEMINI_MODEL,
+            contents=prompt
+        )
 
-            return response.text
+        return response.text
 
-        except ServerError:
-            return (
-                "⚠️ Maaf, server AI sedang sibuk. "
-                "Silakan coba lagi beberapa saat."
-            )
 
-        except Exception as e:
-            print(e)
-            return "Terjadi kesalahan."
+    def extract_memories(self, message: str):
+
+        prompt = f"""
+Analisis pesan user berikut.
+
+Tentukan apakah terdapat informasi pribadi atau preferensi
+yang layak disimpan sebagai memory jangka panjang.
+
+Pesan user:
+
+{message}
+
+Jika ada informasi penting, jawab HANYA dengan format JSON valid:
+
+{{
+    "memories": [
+        {{
+            "key": "nama_key",
+            "value": "nilai"
+        }}
+    ]
+}}
+
+Jika tidak ada informasi penting, jawab:
+
+{{
+    "memories": []
+}}
+
+Jangan tambahkan penjelasan lain.
+"""
+
+        response = self.client.models.generate_content(
+            model=config.GEMINI_MODEL,
+            contents=prompt
+        )
+
+        return response.text
