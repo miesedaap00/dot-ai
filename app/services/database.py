@@ -21,18 +21,50 @@ def init_database():
 
     cursor = conn.cursor()
 
+
+    # MEMORY
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS memories (
+
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+
             user_id TEXT NOT NULL,
+
             key TEXT NOT NULL,
+
             value TEXT NOT NULL,
+
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
             UNIQUE(user_id, key)
+
         )
     """)
+
+
+    # FILES
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS files (
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            user_id TEXT NOT NULL,
+
+            file_name TEXT NOT NULL,
+
+            drive_file_id TEXT NOT NULL,
+
+            mime_type TEXT,
+
+            drive_link TEXT,
+
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+        )
+    """)
+
 
     conn.commit()
 
