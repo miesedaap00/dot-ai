@@ -21,3 +21,13 @@ htmlcov/
 .mypy_cache/
 
 .DS_Store
+
+credentials.json
+
+token.json
+
+data/
+
+logs/
+
+uploads/
