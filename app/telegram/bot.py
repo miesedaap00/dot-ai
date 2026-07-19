@@ -34,18 +34,30 @@ async def handle_message(
     chat_id = update.effective_chat.id
 
 
-    if text.lower().startswith(
-        "kirimkan kembali"
-    ):
+    intent = brain.detect_intent(
+        text
+    )
 
-        file_name = text[
-            len("kirimkan kembali"):
-        ].strip()
+
+    if intent["intent"] == "search_file":
+
+        keyword = intent.get(
+            "keyword"
+        )
+
+
+        if not keyword:
+
+            await update.message.reply_text(
+                "❌ Saya belum tahu file mana yang ingin dicari."
+            )
+
+            return
 
 
         await send_file_back(
             update,
-            file_name
+            keyword
         )
 
         return

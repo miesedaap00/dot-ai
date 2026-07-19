@@ -6,6 +6,8 @@ from app.ai.history import ConversationHistory
 
 from app.ai.memory import MemoryManager
 
+from app.ai.intent import IntentDetector
+
 
 class DotBrain:
 
@@ -16,7 +18,19 @@ class DotBrain:
         self.history = ConversationHistory()
 
         self.memory = MemoryManager()
+        
+        self.intent_detector = IntentDetector(
+            self.gemini
+        )
+        
+    def detect_intent(
+        self,
+        message
+    ):
 
+        return self.intent_detector.detect(
+            message
+        )
 
     def chat(
         self,
@@ -54,23 +68,23 @@ class DotBrain:
 
 
         prompt = f"""
-{SYSTEM_PROMPT}
+        {SYSTEM_PROMPT}
 
-INFORMASI PENTING TENTANG USER:
+        INFORMASI PENTING TENTANG USER:
 
-{memory_text}
+        {memory_text}
 
-RIWAYAT PERCAKAPAN:
+        RIWAYAT PERCAKAPAN:
 
-{conversation_text}
+        {conversation_text}
 
-PESAN USER:
+        PESAN USER:
 
-{message}
+        {message}
 
-Jawab pesan user dengan mempertimbangkan
-memory dan riwayat percakapan.
-"""
+        Jawab pesan user dengan mempertimbangkan
+        memory dan riwayat percakapan.
+        """
 
 
         answer = self.gemini.generate(
